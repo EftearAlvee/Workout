@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Alvee Workout Coach</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;--accent:#2563eb;--good:#15803d;--warn:#b45309;--bad:#b91c1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top{max-width:980px;margin:auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800}.brand small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+nav{display:flex;gap:6px;overflow:auto;padding:8px max(16px,calc((100% - 980px)/2));border-top:1px solid var(--line)}
+nav button{border:0;background:transparent;padding:9px 12px;border-radius:10px;font-weight:700;white-space:nowrap;color:var(--muted)}nav button.active{background:#dbeafe;color:#1d4ed8}
+main{max-width:980px;margin:auto;padding:18px 14px 90px}.hero{background:#111827;color:white;border-radius:20px;padding:20px;margin-bottom:16px}.hero h1{margin:0 0 6px;font-size:25px}.hero p{margin:0;color:#d1d5db}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;box-shadow:0 3px 12px #00000008}.card h3{margin:0 0 6px;font-size:16px}.muted{color:var(--muted);font-size:13px}
+.btn{border:0;border-radius:11px;padding:10px 13px;font-weight:750;background:var(--accent);color:white;cursor:pointer}.btn.secondary{background:#eef2ff;color:#3730a3}.btn.ghost{background:#f3f4f6;color:#374151}.btn.danger{background:#fee2e2;color:#991b1b}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{justify-content:space-between}.section-title{margin:20px 0 10px;font-size:20px}
+.day{border:1px solid var(--line);background:#fff;border-radius:15px;padding:13px;margin:10px 0}.day-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.tag{font-size:11px;background:#eef2ff;color:#3730a3;padding:4px 7px;border-radius:999px;font-weight:700}
+.exercise{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.exercise summary{cursor:pointer;font-weight:800}.exercise-body{padding-top:10px}.sets{width:100%;border-collapse:collapse;font-size:13px}.sets th,.sets td{border:1px solid var(--line);padding:7px;text-align:center}.sets th{background:#f9fafb}.sets input{width:62px;max-width:100%;padding:7px;border:1px solid #d1d5db;border-radius:7px;text-align:center}
+.formbox{width:100%;min-height:55px;padding:8px;border:1px solid #d1d5db;border-radius:8px;font:inherit}.cue{background:#f9fafb;border-radius:10px;padding:10px;font-size:13px;margin:8px 0}.cue ul{margin:6px 0 0 18px;padding:0}
+.anim{height:190px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;position:relative;overflow:hidden;margin:10px 0}.anim svg{width:100%;height:100%}.anim-label{position:absolute;left:10px;top:8px;background:white;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}.phase{position:absolute;right:10px;top:8px;font-size:11px;color:var(--muted)}
+.timer{font-size:30px;font-variant-numeric:tabular-nums;font-weight:800}.progress{height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:var(--accent);width:0}
+.stat{font-size:28px;font-weight:850}.install{position:fixed;right:14px;bottom:14px;z-index:20;box-shadow:0 8px 25px #0003}
+.smallbtn{padding:6px 8px;font-size:11px;border-radius:8px;border:1px solid var(--line);background:#fff}
+@media(max-width:600px){main{padding:13px 10px 90px}.hero{padding:17px}.hero h1{font-size:22px}.sets{font-size:11px}.sets input{width:49px;padding:6px}.card{padding:12px}}
+</style>
+</head>
+<body>
+<header>
+<div class="top"><div class="brand">Alvee Workout Coach<small>3-day routine × 2 + rotating abs</small></div><button class="btn ghost" id="installBtn" style="display:none">Install</button></div>
+<nav id="nav"></nav>
+</header>
+<main id="app"></main>
+<script>
+const DATA = {"incline-machine-chest-press": {"id": "incline-machine-chest-press", "name": "Incline Machine Chest Press", "day": "Day 1", "muscle": "Chest", "type": "compound", "rest": "2\u20133 min", "cue": "Brace your torso, keep shoulders back, press smoothly, and control the stretch.", "steps": ["Seat so handles align with mid/lower chest.", "Keep shoulder blades gently back and down.", "Press without shrugging.", "Lower for about 2 seconds."], "anim": "Press"}, "pectoral-fly": {"id": "pectoral-fly", "name": "Pectoral Fly", "day": "Day 1", "muscle": "Chest", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Keep a soft elbow bend and move from the shoulders. Stretch under control and squeeze the chest.", "steps": ["Chest stays against the pad.", "Keep elbow angle mostly fixed.", "Bring handles together without slamming.", "Control the return."], "anim": "Fly"}, "super-decline-chest-press": {"id": "super-decline-chest-press", "name": "Super Decline Chest Press", "day": "Day 1", "muscle": "Chest", "type": "compound", "rest": "2\u20133 min", "cue": "Keep your back supported and press with control. Use a load that does not make your shoulders take over.", "steps": ["Set the seat/pad securely.", "Keep shoulders stable.", "Lower under control.", "Do not bounce."], "anim": "Press"}, "machine-shoulder-press": {"id": "machine-shoulder-press", "name": "Machine Shoulder Press", "day": "Day 1", "muscle": "Shoulders", "type": "compound", "rest": "2\u20133 min", "cue": "Back supported, core braced, press upward without excessive shrugging or lower-back arching.", "steps": ["Handles start around shoulder level.", "Keep feet planted.", "Brace your abdomen.", "Stop before painful range."], "anim": "Press"}, "dumbbell-lateral-raise": {"id": "dumbbell-lateral-raise", "name": "Dumbbell Lateral Side Raise", "day": "Day 1", "muscle": "Shoulders", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Use light dumbbells. Lead with the elbows, raise to about shoulder height, then lower slowly.", "steps": ["Stand tall with a slight elbow bend.", "Do not swing.", "Do not shrug excessively.", "Control the lowering."], "anim": "Raise"}, "tricep-pressdown": {"id": "tricep-pressdown", "name": "Tricep Press Down", "day": "Day 1", "muscle": "Triceps", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Keep upper arms near your sides and move mainly at the elbows.", "steps": ["Elbows stay close to torso.", "Push down smoothly.", "Squeeze at the bottom.", "Return without letting shoulders roll forward."], "anim": "Pressdown"}, "tricep-machine-dips": {"id": "tricep-machine-dips", "name": "Tricep Machine Dips", "day": "Day 1", "muscle": "Triceps", "type": "compound", "rest": "2\u20133 min", "cue": "Stay stable against the machine, press through the handles, and avoid forcing excessive depth.", "steps": ["Set the seat correctly.", "Grip firmly.", "Keep shoulders controlled.", "Stop if shoulder discomfort appears."], "anim": "Dip"}, "lat-pulldown": {"id": "lat-pulldown", "name": "Lat Pull Down", "day": "Day 2", "muscle": "Back", "type": "compound", "rest": "2\u20133 min", "cue": "Pull the elbows down toward your hips and bring the bar to the upper chest. Avoid behind-the-neck pulls.", "steps": ["Chest up, torso stable.", "Start with arms extended.", "Drive elbows down.", "Control the return."], "anim": "Pull"}, "machine-low-row": {"id": "machine-low-row", "name": "Machine Low Row", "day": "Day 2", "muscle": "Back", "type": "compound", "rest": "2\u20133 min", "cue": "Pull toward your torso by driving the elbows back, then extend under control.", "steps": ["Set chest/support position.", "Keep shoulders down.", "Pull elbows back.", "Avoid jerking."], "anim": "Row"}, "dy-row": {"id": "dy-row", "name": "D.Y Row", "day": "Day 2", "muscle": "Back", "type": "compound", "rest": "2\u20133 min", "cue": "Use the machine's support, pull the handles toward the body, squeeze the upper/mid back, and return slowly.", "steps": ["Keep torso supported if the machine has a pad.", "Pull with elbows.", "Avoid shrugging.", "Use controlled range."], "anim": "Row"}, "seated-cable-row": {"id": "seated-cable-row", "name": "Seated Cable Row", "day": "Day 2", "muscle": "Back", "type": "compound", "rest": "2\u20133 min", "cue": "Keep the spine neutral, pull the elbows back, squeeze, and return without excessive torso rocking.", "steps": ["Arms start extended.", "Brace before pulling.", "Small natural torso movement is okay.", "Do not turn it into a lower-back swing."], "anim": "Row"}, "pectoral-reverse-fly": {"id": "pectoral-reverse-fly", "name": "Pectoral Reverse Fly", "day": "Day 2", "muscle": "Rear Delts", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Move the arms outward/back with a soft elbow bend. Keep the neck relaxed and shoulders down.", "steps": ["Chest supported.", "Use light weight.", "Lead with elbows.", "Control the return."], "anim": "Reverse"}, "barbell-curl": {"id": "barbell-curl", "name": "Barbell Curl", "day": "Day 2", "muscle": "Biceps", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Keep elbows near your sides, curl without swinging, squeeze, and lower slowly.", "steps": ["Stand tall.", "Keep elbows close.", "No hip drive.", "Use a controlled lowering."], "anim": "Curl"}, "dumbbell-curl": {"id": "dumbbell-curl", "name": "Dumbbell Curl", "day": "Day 2", "muscle": "Biceps", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Curl with a stable torso. Avoid swinging and emphasize the controlled lowering.", "steps": ["Keep shoulders relaxed.", "Elbows stay near sides.", "Squeeze at top.", "Lower slowly."], "anim": "Curl"}, "hammer-curl": {"id": "hammer-curl", "name": "Dumbbell Hammer Curl", "day": "Day 2", "muscle": "Biceps/Forearms", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Use a neutral grip with palms facing each other. Keep elbows close and avoid body swing.", "steps": ["Neutral grip.", "Stable torso.", "Curl smoothly.", "Control the descent."], "anim": "Hammer"}, "barbell-leg-squat": {"id": "barbell-leg-squat", "name": "Barbell Legs Squats", "day": "Day 3", "muscle": "Quads/Glutes", "type": "compound", "rest": "2\u20133 min", "cue": "Brace before descent, keep knees tracking with toes, use a controllable depth, and drive through the floor.", "steps": ["Feet roughly shoulder width, adjusted to you.", "Toes slightly out if comfortable.", "Brace before descending.", "Do not let knees collapse inward."], "anim": "Squat"}, "leg-press": {"id": "leg-press", "name": "Legs Press", "day": "Day 3", "muscle": "Quads/Glutes", "type": "compound", "rest": "2\u20133 min", "cue": "Keep feet stable, lower under control, and avoid excessive pelvic tuck or aggressive knee lockout.", "steps": ["Set feet securely.", "Knees track with toes.", "Use a controllable depth.", "Do not bounce at bottom."], "anim": "Press"}, "hack-squat": {"id": "hack-squat", "name": "Hack Squats", "day": "Day 3", "muscle": "Quads/Glutes", "type": "compound", "rest": "2\u20133 min", "cue": "Keep back against the pad, descend slowly, and drive up without bouncing.", "steps": ["Back stays supported.", "Feet stable.", "Knees track with toes.", "Control the bottom."], "anim": "Squat"}, "leg-curl": {"id": "leg-curl", "name": "Legs Curl", "day": "Day 3", "muscle": "Hamstrings", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Align your knee with the machine pivot, curl smoothly, squeeze, and return slowly.", "steps": ["Adjust the machine to your knee joint.", "Keep hips stable.", "Squeeze hamstrings.", "No jerking."], "anim": "Curl"}, "hip-thrust": {"id": "hip-thrust", "name": "Hip Thrust", "day": "Day 3", "muscle": "Glutes", "type": "compound", "rest": "2\u20133 min", "cue": "Drive hips forward and squeeze glutes at the top without hyperextending the lower back.", "steps": ["Upper back supported.", "Pad the bar at the hips.", "Brace your core.", "Finish with hips, not a back arch."], "anim": "Hip"}, "machine-abductor": {"id": "machine-abductor", "name": "Machine Abductor", "day": "Day 3", "muscle": "Glutes", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Push knees outward under control, pause briefly, then return without bouncing.", "steps": ["Sit firmly against pad.", "Use controlled range.", "Pause at contraction.", "Do not bounce."], "anim": "Abduct"}, "machine-calf-raise": {"id": "machine-calf-raise", "name": "Machine Calf Raise", "day": "Day 3", "muscle": "Calves", "type": "isolation", "rest": "60\u2013120 sec", "cue": "Use a full, controlled range: stretch, rise onto toes, squeeze, and lower slowly.", "steps": ["Stable foot position.", "Use a safe stretch.", "Squeeze at top.", "No bouncing."], "anim": "Calf"}, "dead-bug": {"id": "dead-bug", "name": "Dead Bug", "day": "Abs A", "muscle": "Core", "type": "core", "rest": "60 sec", "cue": "Keep your lower back gently anchored while moving opposite arm and leg slowly.", "steps": ["Brace before each rep.", "Move opposite arm and leg.", "Do not let the lower back arch.", "Slow tempo."], "anim": "Deadbug"}, "cable-crunch": {"id": "cable-crunch", "name": "Cable Crunch", "day": "Abs A", "muscle": "Core", "type": "core", "rest": "60\u201390 sec", "cue": "Curl your ribcage toward your pelvis by flexing the trunk. Do not simply pull the rope with your arms.", "steps": ["Kneel tall.", "Keep hips relatively fixed.", "Exhale as you crunch.", "Control the return."], "anim": "Crunch"}, "hanging-knee-raise": {"id": "hanging-knee-raise", "name": "Hanging Knee Raise", "day": "Abs A", "muscle": "Core", "type": "core", "rest": "60\u201390 sec", "cue": "Raise knees by curling the pelvis, not by swinging. Lower under control.", "steps": ["Start from a stable hang.", "Brace first.", "Bring knees upward with control.", "Avoid swinging."], "anim": "KneeRaise"}, "plank": {"id": "plank", "name": "Front Plank", "day": "Abs B", "muscle": "Core", "type": "core", "rest": "60 sec", "cue": "Keep head, ribs, pelvis, and legs aligned. Brace as if preparing for a punch.", "steps": ["Elbows under shoulders.", "Squeeze glutes.", "Brace abdomen.", "Do not let hips sag."], "anim": "Plank"}, "reverse-crunch": {"id": "reverse-crunch", "name": "Reverse Crunch", "day": "Abs B", "muscle": "Core", "type": "core", "rest": "60\u201390 sec", "cue": "Curl the pelvis toward the ribs and lower slowly. Avoid using momentum.", "steps": ["Lie flat with knees bent.", "Brace first.", "Curl pelvis upward.", "Slowly lower."], "anim": "ReverseCrunch"}, "pallof-press": {"id": "pallof-press", "name": "Pallof Press", "day": "Abs B", "muscle": "Core", "type": "core", "rest": "60\u201390 sec", "cue": "Stand perpendicular to the cable, resist rotation, press hands away, then return.", "steps": ["Cable at chest height.", "Feet stable.", "Brace against rotation.", "Move arms without twisting torso."], "anim": "Pallof"}};
+const SCHEDULE = [{"day": "MON", "label": "Day 1 + Abs A", "workout": "Day 1", "abs": "Abs A"}, {"day": "TUE", "label": "Day 2", "workout": "Day 2", "abs": null}, {"day": "WED", "label": "Day 3 + Abs B", "workout": "Day 3", "abs": "Abs B"}, {"day": "THU", "label": "Day 1", "workout": "Day 1", "abs": null}, {"day": "FRI", "label": "Day 2 + Abs A", "workout": "Day 2", "abs": "Abs A"}, {"day": "SAT", "label": "Day 3", "workout": "Day 3", "abs": null}, {"day": "SUN", "label": "Rest", "workout": null, "abs": null}];
+const KEY='alveeWorkoutV1';
+let state=JSON.parse(localStorage.getItem(KEY)||'{"logs":{},"body":[],"settings":{"week":1}}');
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function nav(){
+ const tabs=[['home','Home'],['workouts','Workouts'],['progress','Progress'],['guide','Guide']];
+ document.getElementById('nav').innerHTML=tabs.map(([id,t])=>`<button data-tab="${id}">${t}</button>`).join('');
+ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.tab));
+}
+function exerciseIds(day,abs){
+ let ids=Object.values(DATA).filter(x=>x.day===day).map(x=>x.id);
+ if(abs) ids.push(...Object.values(DATA).filter(x=>x.day===abs).map(x=>x.id));
+ return ids;
+}
+function show(tab='home'){
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+ const app=document.getElementById('app');
+ if(tab==='home') home(app); else if(tab==='workouts') workouts(app); else if(tab==='progress') progress(app); else guide(app);
+}
+function home(app){
+ const today=['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
+ const s=SCHEDULE.find(x=>x.day===today);
+ app.innerHTML=`<section class="hero"><h1>${s.label}</h1><p>${s.workout?'Today: '+s.workout+(s.abs?' + '+s.abs:''):'Recovery day'}. Log every set and keep most working sets around 1–3 RIR.</p><div class="row" style="margin-top:14px"><button class="btn" onclick="startSession('${s.workout||''}','${s.abs||''}')">${s.workout?'Start today':'View week'}</button><button class="btn secondary" onclick="show('progress')">Track progress</button></div></section>
+ <div class="grid"><div class="card"><div class="muted">Workout frequency</div><div class="stat">6 + 1</div><div class="muted">six training days, Sunday rest</div></div><div class="card"><div class="muted">Abs</div><div class="stat">3× / week</div><div class="muted">rotating Abs A and B</div></div><div class="card"><div class="muted">Target</div><div class="stat">4×12</div><div class="muted">record actual reps if they differ</div></div></div>
+ <h2 class="section-title">This week's schedule</h2>${SCHEDULE.map(x=>`<div class="day"><div class="day-head"><b>${x.day}</b><span class="tag">${x.label}</span></div><div class="muted">${x.workout?x.workout+(x.abs?' + '+x.abs:''):'Rest / recovery'}</div></div>`).join('')}`;
+}
+function workouts(app){
+ app.innerHTML=`<h2 class="section-title">Workouts</h2><div class="grid">${['Day 1','Day 2','Day 3','Abs A','Abs B'].map(d=>`<div class="card"><h3>${d}</h3><div class="muted">${Object.values(DATA).filter(x=>x.day===d).length} exercises</div><button class="btn" style="margin-top:10px" onclick="startSession('${d.startsWith('Abs')?'':d}','${d.startsWith('Abs')?d:''}')">Open</button></div>`).join('')}</div>
+ <h2 class="section-title">6-day rotation</h2>${SCHEDULE.map(x=>`<div class="day"><div class="day-head"><b>${x.day}</b><span class="tag">${x.label}</span></div></div>`).join('')}`;
+}
+function startSession(day,abs){
+ if(!day){day=abs;abs=''}
+ const ids=exerciseIds(day,abs);
+ let idx=0;
+ renderSession(app=document.getElementById('app'),ids,idx,day,abs);
+}
+function renderSession(app,ids,idx,day,abs){
+ const ex=DATA[ids[idx]];
+ const logKey=new Date().toISOString().slice(0,10)+'_'+ex.id;
+ const old=state.logs[logKey]||{sets:[{},{},{},{}],form:'',notes:''};
+ const sets=old.sets||[{},{},{},{}];
+ app.innerHTML=`<div class="row sp"><div><div class="muted">${day}${abs?' + '+abs:''}</div><h2 style="margin:2px 0">${esc(ex.name)}</h2></div><span class="tag">${idx+1}/${ids.length}</span></div>
+ <div class="anim">${animation(ex.anim)}<div class="anim-label">${esc(ex.name)}</div><div class="phase" id="phase">Controlled return</div></div>
+ <div class="cue"><b>Form cue:</b> ${esc(ex.cue)}<ul>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>
+ <div class="card"><div class="row sp"><b>Target: 4 × 12</b><span class="muted">Rest: ${ex.rest}</span></div><table class="sets"><thead><tr><th>Set</th><th>Weight</th><th>Reps</th><th>RIR</th><th>Form</th></tr></thead><tbody>${[0,1,2,3].map(i=>`<tr><td>${i+1}</td><td><input inputmode="decimal" id="w${i}" value="${esc(sets[i]?.weight||'')}"></td><td><input inputmode="numeric" id="r${i}" value="${esc(sets[i]?.reps||'')}"></td><td><input inputmode="numeric" id="q${i}" value="${esc(sets[i]?.rir||'')}"></td><td><input id="f${i}" maxlength="1" value="${esc(sets[i]?.form||'')}"></td></tr>`).join('')}</tbody></table>
+ <div style="margin-top:10px"><label class="muted">Form notes</label><textarea class="formbox" id="form">${esc(old.form||'')}</textarea></div><div style="margin-top:8px"><label class="muted">Pain/discomfort or other notes</label><textarea class="formbox" id="notes">${esc(old.notes||'')}</textarea></div>
+ </div>
+ <div class="row sp" style="margin-top:12px"><button class="btn ghost" onclick="show('workouts')">Exit</button><div class="row"><button class="btn secondary" onclick="restTimer(${parseInt(ex.rest)||60})">Rest timer</button>${idx<ids.length-1?`<button class="btn" onclick="nextEx('${ids.join(',')}','${idx}','${day}','${abs}')">Save & Next</button>`:`<button class="btn" onclick="finishSession('${day}','${abs}')">Finish</button>`}</div></div>`;
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function saveCurrent(exId){
+ const key=new Date().toISOString().slice(0,10)+'_'+exId;
+ const sets=[0,1,2,3].map(i=>({weight:document.getElementById('w'+i).value,reps:document.getElementById('r'+i).value,rir:document.getElementById('q'+i).value,form:document.getElementById('f'+i).value}));
+ state.logs[key]={sets,form:document.getElementById('form').value,notes:document.getElementById('notes').value,ts:Date.now()};
+ save();
+}
+function nextEx(ids,idx,day,abs){saveCurrent(ids.split(',')[+idx]);renderSession(document.getElementById('app'),ids.split(','),+idx+1,day,abs)}
+function finishSession(day,abs){saveCurrent(document.querySelector('.anim .anim-label')?.textContent?Object.values(DATA).find(x=>x.name===document.querySelector('.anim .anim-label').textContent)?.id:'');alert('Saved. Good session.');show('progress')}
+function restTimer(seconds){
+ let left=seconds, box=document.createElement('div');box.className='card';box.style.position='fixed';box.style.left='12px';box.style.right='12px';box.style.bottom='18px';box.style.zIndex='30';box.innerHTML=`<div class="muted">Rest timer</div><div class="timer" id="rt">${left}s</div><div class="progress"><i id="rp"></i></div><button class="btn danger" style="margin-top:10px" id="closeT">Stop</button>`;document.body.appendChild(box);
+ let t=setInterval(()=>{left--;document.getElementById('rt').textContent=left+'s';document.getElementById('rp').style.width=(100*(seconds-left)/seconds)+'%';if(left<=0){clearInterval(t);navigator.vibrate?.(200)}},1000);document.getElementById('closeT').onclick=()=>{clearInterval(t);box.remove()}
+}
+function progress(app){
+ const entries=Object.entries(state.logs);
+ const completed=entries.length;
+ const bodyAvg=state.body.length?state.body.reduce((a,b)=>a+Number(b.weight),0)/state.body.length:0;
+ app.innerHTML=`<h2 class="section-title">Progress</h2><div class="grid"><div class="card"><div class="muted">Logged exercise entries</div><div class="stat">${completed}</div></div><div class="card"><div class="muted">Average logged bodyweight</div><div class="stat">${bodyAvg?bodyAvg.toFixed(1):'—'} <small>kg</small></div></div></div>
+ <div class="card" style="margin-top:12px"><h3>Morning bodyweight</h3><div class="row"><input id="bw" inputmode="decimal" placeholder="kg" style="padding:10px;border:1px solid #d1d5db;border-radius:8px"><button class="btn" onclick="addBW()">Add</button></div><div style="margin-top:10px">${state.body.slice(-14).reverse().map(x=>`<div class="row sp" style="padding:7px 0;border-bottom:1px solid var(--line)"><span>${esc(x.date)}</span><b>${esc(x.weight)} kg</b></div>`).join('')||'<span class="muted">No bodyweight entries yet.</span>'}</div></div>
+ <div class="card" style="margin-top:12px"><h3>Export / reset</h3><p class="muted">Export creates a JSON backup you can keep on your phone.</p><div class="row"><button class="btn secondary" onclick="exportData()">Export backup</button><button class="btn danger" onclick="resetData()">Reset all data</button></div></div>`;
+}
+function addBW(){let v=document.getElementById('bw').value;if(!v)return;state.body.push({date:new Date().toISOString().slice(0,10),weight:Number(v)});save();progress(document.getElementById('app'))}
+function exportData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.download='alvee-workout-backup.json';a.click()}
+function resetData(){if(confirm('Delete all workout logs and bodyweight data?')){state={logs:{},body:[],settings:{week:1}};save();show('progress')}}
+function guide(app){
+ app.innerHTML=`<h2 class="section-title">Form & progression guide</h2><div class="grid">
+ <div class="card"><h3>RIR</h3><p class="muted"><b>1–3 RIR</b> is the default for most working sets. RIR 2 means you believe you had about two clean reps left.</p></div>
+ <div class="card"><h3>Progressive overload</h3><p class="muted">When you reach 12/12/12/12 with clean form and roughly 1–3 RIR, increase the load by the smallest practical amount.</p></div>
+ <div class="card"><h3>Form rating</h3><p class="muted"><b>A</b> = clean. <b>B</b> = minor breakdown. <b>C</b> = weight too heavy or technique breaking. If form is C, reduce the load.</p></div>
+ <div class="card"><h3>Warm-up</h3><p class="muted">5–10 minutes of easy movement, then a few lighter sets before the first major compound exercise. Don't fatigue yourself during warm-up.</p></div>
+ <div class="card"><h3>Abs schedule</h3><p class="muted">Abs are added 3×/week, after the main workout. Rotate Abs A and B rather than training abs hard every day.</p></div>
+ <div class="card"><h3>Safety</h3><p class="muted">Normal muscular effort is expected. Stop an exercise for sharp pain, unusual joint pain, dizziness, or loss of control.</p></div>
+ </div>`;
+}
+function animation(kind){
+ const base=`<svg viewBox="0 0 320 180" aria-label="animated form demonstration"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">`;
+ const end=`</g></svg>`;
+ const head='<circle cx="160" cy="36" r="13"/>';
+ let body='';
+ if(['Press','Pressdown','Dip','Pallof'].includes(kind)) body='<path d="M160 50 L160 110"/><path d="M160 65 L110 82 M160 65 L210 82"/><path d="M160 110 L125 150 M160 110 L195 150"/>';
+ else if(['Pull','Row','Reverse'].includes(kind)) body='<path d="M155 52 L155 105"/><path d="M155 65 L95 75 M155 65 L215 75"/><path d="M155 105 L125 150 M155 105 L190 150"/>';
+ else if(kind==='Raise') body='<path d="M160 50 L160 110"/><path d="M160 70 L95 100 M160 70 L225 100"/><path d="M160 110 L130 150 M160 110 L190 150"/>';
+ else if(['Curl','Hammer'].includes(kind)) body='<path d="M160 50 L160 110"/><path d="M160 68 L120 82 L105 115 M160 68 L200 82 L215 115"/><path d="M160 110 L130 150 M160 110 L190 150"/>';
+ else if(kind==='Squat') body='<path d="M160 50 L160 100"/><path d="M160 62 L105 60 M160 62 L215 60"/><path d="M160 100 L120 125 L105 155 M160 100 L200 125 L215 155"/>';
+ else if(kind==='Hip') body='<path d="M145 85 L195 85 L220 120"/><path d="M145 85 L125 125"/><path d="M125 125 L105 155 M220 120 L235 155"/><circle cx="140" cy="70" r="12"/>';
+ else if(kind==='Curl') body='<path d="M160 50 L160 110"/>';
+ else if(kind==='Calf') body='<path d="M160 50 L160 110"/><path d="M160 110 L130 150 M160 110 L190 150"/>';
+ else if(kind==='Abduct') body='<circle cx="160" cy="45" r="12"/><path d="M160 57 L160 105"/><path d="M160 105 L125 145 M160 105 L195 145"/>';
+ else if(kind==='Deadbug') body='<path d="M130 105 L210 105"/><circle cx="115" cy="105" r="12"/><path d="M145 105 L120 65 M175 105 L200 65 M155 105 L155 150 M190 105 L215 140"/>';
+ else if(kind==='Crunch'||kind==='ReverseCrunch') body='<circle cx="110" cy="110" r="12"/><path d="M122 110 Q160 70 205 105"/><path d="M160 88 L145 55 M160 88 L180 55"/>';
+ else if(kind==='KneeRaise') body='<circle cx="160" cy="35" r="12"/><path d="M160 48 L160 105"/><path d="M160 60 L130 75 M160 60 L190 75"/><path d="M160 105 L125 135 M160 105 L205 115"/>';
+ else if(kind==='Plank') body='<circle cx="85" cy="105" r="11"/><path d="M96 105 L175 105 L235 145"/><path d="M130 105 L115 145 M175 105 L190 145"/>';
+ else body='<circle cx="160" cy="40" r="12"/><path d="M160 52 L160 115"/><path d="M160 70 L125 90 M160 70 L195 90"/><path d="M160 115 L130 150 M160 115 L190 150"/>';
+ return base+head+body+`</g><g fill="currentColor"><text x="160" y="174" text-anchor="middle" font-size="11">Slow • controlled • full comfortable range</text></g>`+end;
+}
+nav();show('home');
+
+let deferred;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;document.getElementById('installBtn').style.display='block'});
+document.getElementById('installBtn').onclick=async()=>{if(deferred){deferred.prompt();deferred=null}};
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
